@@ -9,29 +9,22 @@
   }
 
   function solution() {
-    const input: number[][] = getInput()
-      .split("\n")
-      .map((e) => e.split(" "))
-      .map((e) => e.map((j) => parseInt(j)));
+    const input: string[] = getInput().split("\n");
 
-    const length = input[0][0];
-    const data = input.slice(1);
+    const length = parseInt(input[0]);
+    const data = input[1].split(" ").map((e) => parseInt(e));
 
-    const dp: number[][] = new Array(length)
-      .fill(0)
-      .map((e) => new Array(3).fill(0));
+    const dp = new Array(length).fill(0);
+    dp[0] = data[0];
 
-    dp[0] = dp[0].map((e, i) => {
-      return data[0][i];
-    });
+    let ans = data[0];
 
     for (let i = 1; i < length; i++) {
-      dp[i][0] = Math.min(data[i][0] + dp[i - 1][1], data[i][0] + dp[i - 1][2]);
-      dp[i][1] = Math.min(data[i][1] + dp[i - 1][0], data[i][1] + dp[i - 1][2]);
-      dp[i][2] = Math.min(data[i][2] + dp[i - 1][0], data[i][2] + dp[i - 1][1]);
+      dp[i] = Math.max(data[i], data[i] + dp[i - 1]);
+      ans = Math.max(ans, dp[i]);
     }
 
-    console.log(Math.min(...dp[length - 1]));
+    console.log(ans);
   }
 
   solution();
