@@ -5,45 +5,44 @@
         var input = fs.readFileSync(filePath).toString().trim();
         return input;
     }
-    //13305번 문제
-    //기름이 0인채로 시작
-    //첫번째 도시에서 기름을 넣지 않으면 다음 도시로 이동하지 못함
-    //두번째 도시부터는 만약 기름을 다 썻다면 최소한 다음 도시까지는 현재 도시에서 넣어야함
-    //현재 도시에서의 최적의 해는 현재 도시부터 첫번째 도시까지의 주유소 중 제일 저렴한 곳에서
-    //기름을 넣는 것
-    //거리 1 ~ 1,000,000,000
-    //기름값 1 ~ 1,000,000,000
-    //도시 수 2 ~ 100,000
-    //거리 * 기름 값 max는 1*10^18
-    //도시까지 max이면 1 * 10^23
-    //node의 number 타입은 -(2^53 − 1)부터 2^53 − 1까지의 수
-    //2^53 = 9.007 * e+15 -> 2^10이 얼추 1000 => 2^(10*5.3) = 얼추 1000^5 = 15자리 -> 대략 e+16 - 1
-    //number는 15자리까지 가능함
-    //BigInt 사용해야함
-    //BigInt는 숫자 마지막에 n붙어 있음 -> string으로 변환하면 n사라짐
-    //추가로 부분점수 받았던 이유
-    //매번 이전 도시까지의 가장 저렴한 주유소를 기름값 배열을 탐색해서 가져왔음
-    //거리 배열 탐색시간 n * 기름값 배열 탐색 n으로 n^2
-    //매 주유소에서 찾은 저렴한 기름값을 저장해두면 이전 도시에서 주유했던 기름값과 현재 기름값만 비교하면됨
-    //기름값 메모이제이션하니까 100점 나옴
+    //1541번 문제
+    //+,-와 괄호로 식을 만듬
+    //이후에 괄호를 지움
+    //괄호는 연산자 사이에도 들어갈 수 있음
+    //string으로 +,- 다 나눈 후에
+    //순서대로 연산을 진행
+    //-를 크게 만들 수록 작은 수를 만들 수 있음
+    //배열 순회 -> -에서 괄호 시작해서 +인 경우 계속 진행, -를 만나면 괄호 종료
+    //최적해 -> -를 만나면 괄호를 시작 -> 다시 -를 만나면 괄호를 종료 & 다시 괄호 시작
+    //따라서 -를 만나면 계속 숫자 빼면됨 -> 다시 -를 만나도 거기부터 다시 괄호 시작한다 생각
     function solution() {
-        var input = getInput().split("\n");
-        var length = parseInt(input[0]);
-        var roadLength = input[1]
-            .trim()
-            .split(" ")
-            .map(function (length) { return parseInt(length); });
-        var gasFee = input[2]
-            .trim()
-            .split(" ")
-            .map(function (gas) { return parseInt(gas); });
-        var memoFee = Number.MAX_SAFE_INTEGER;
-        var totalFee = roadLength.reduce(function (total, cur, index, roadLength) {
-            memoFee = Math.min(gasFee[index], memoFee);
-            var curFee = BigInt(roadLength[index]) * BigInt(memoFee);
-            return total + curFee;
-        }, BigInt(0));
-        console.log(totalFee.toString());
+        var input = getInput().split("");
+        var number = 0;
+        var total = 0;
+        var isMinus = false;
+        var ans = input.reduce(function (total, cur, index) {
+            var curNum = Number(cur);
+            if (cur === "-") {
+                var realNum = isMinus ? -1 * number : number;
+                number = 0;
+                isMinus = true;
+                return total + realNum;
+            }
+            else if (cur === "+") {
+                var realNum = isMinus ? -1 * number : number;
+                number = 0;
+                return total + realNum;
+            }
+            else {
+                number *= 10;
+                number += curNum;
+                if (index === input.length - 1) {
+                    return total + (isMinus ? -1 * number : number);
+                }
+                return total;
+            }
+        }, 0);
+        console.log(ans);
     }
     solution();
 })();
